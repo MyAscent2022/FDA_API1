@@ -24,53 +24,32 @@ import org.hibernate.annotations.Subselect;
         + "iSched.id,\n"
         + "u.id AS user_id,\n"
         + "ca.application_number,\n"
-        + "ai.document_type,\n"
-        + "ai.inspection_type,\n"
-        + "iSched.inspection_date,\n"
+        + "iSched.inspector_id,\n"
+        + "iSched.document_type,\n"
+        + "iSched.inspection_type,\n"
+        + "iSched.inspection_date, \n"
+        + "iSched.status, \n"
+        + "iSched.inspection_time_from,\n"
+        + "iSched.inspection_time_to,\n"
         + "ubp.name as company_name,\n"
         + "rpt.name AS product_type,\n"
-        + "rpa.activity_name AS primary_activity,\n"
+        + "rpa.name AS primary_activity,\n"
         + "CONCAT(up.first_name, ' ' ,up.last_name) as contact_person,\n"
         + "ubp.mobile_no as contact_no,\n"
         + "CONCAT(laa.street_name, ',', rm.citymun_desc, ',', pr.prov_desc) AS office_address\n"
-        + "FROM inspections.application_items ai\n"
-        + "INNER JOIN inspections.inspection_schedules iSched ON iSched.application_item_id = ai.id\n"
-        + "AND iSched.application_item_type = ai.document_type\n"
-        + "INNER JOIN cpr.cpr_applications ca ON ca.application_number = ai.application_number\n"
+        + "FROM inspections.inspection_schedules iSched\n"
+        + "INNER JOIN cpr.cpr_applications ca ON ca.application_number = iSched.application_number\n"
+        + "INNER JOIN lto.lto_records lr ON lr.id = ca.lto_record_id\n"
         + "INNER JOIN commons.users u ON u.id = ca.created_by_id\n"
         + "INNER JOIN commons.user_profiles up ON up.id = u.user_profile_id\n"
         + "INNER JOIN commons.user_business_profiles ubp ON ubp.id = u.business_profile_id\n"
-        + "INNER JOIN refs.ref_product_types rpt ON rpt.id = ai.product_type_id\n"
-        + "INNER JOIN refs.ref_product_activities rpa ON rpa.id = ai.primary_activity_id\n"
-        + "INNER JOIN lto.lto_application_addresses laa ON laa.created_by_id = u.id\n"
+        + "INNER JOIN refs.ref_product_types rpt ON rpt.id = iSched.product_type_id\n"
+        + "INNER JOIN refs.ref_activities rpa ON rpa.id = iSched.primary_activity_id \n"
+        + "INNER JOIN lto.lto_record_addresses laa ON laa.id = lr.office_address_id\n"
         + "INNER JOIN refs.ref_municipalities rm ON rm.muni_id = laa.city_municipal_id\n"
         + "INNER JOIN refs.ref_provinces pr ON pr.province_id = laa.province_id\n"
-        + "WHERE iSched.status = 'confirmed'")
-//@Subselect("SELECT iSched.id, \n"
-//        + "cp.id AS company_profile_id, \n"
-//        + "iSched.lto_application_id,\n"
-//        + "ca.application_no,\n"
-//        + "iSched.permit_type, \n"
-//        + "iSched.inspection_type, \n"
-//        + "iSched.inspection_sched, \n"
-//        + "cp.company_name, \n"
-//        + "lr.lto_number, \n"
-//        + "ca.cpr_no, \n"
-//        + "lr.validity_date, \n"
-//        + "rpt.name AS product_type, \n"
-//        + "rpa.activity_name AS primary_activity, \n"
-//        + "lr.office_address,\n"
-//        + "CONCAT(lr.authorized_officer_firstname, ' ', lr.authorized_officer_middlename, ' ', lr.authorized_officer_lastname) AS contact_person,\n"
-//        + "lr.establishment_mobile AS contact_no,\n"
-//        + "ca.created_by_id\n"
-//        + "FROM cpr.cpr_applications ca\n"
-//        + "LEFT JOIN lto.lto_records lr ON lr.id = ca.lto_record_id\n"
-//        + "LEFT JOIN commons.inspection_scheduling iSched ON iSched.lto_application_id = lr.lto_application_id\n"
-//        + "LEFT JOIN commons.bridge_company_users bcu ON bcu.user_id = ca.created_by_id\n"
-//        + "LEFT JOIN cprs.company_profiles cp ON cp.id = bcu.company_profile_id\n"
-//        + "INNER JOIN refs.ref_product_types rpt ON rpt.id = iSched.product_type_id\n"
-//        + "INNER JOIN refs.ref_product_activities rpa ON rpa.id = iSched.primary_activity_id \n"
-//        + "WHERE iSched.status = 'confirmed'")
+        + "WHERE iSched.status IN ('FOR_CONFIRMATION', 'CONFIRMED')")
+
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CompanyCprPREListEntity {
 
@@ -79,6 +58,9 @@ public class CompanyCprPREListEntity {
 
   @Column(name = "user_id")
   int userId;
+
+  @Column(name = "inspector_id")
+  int inspectorId;
 
   @Column(name = "application_number")
   String applicationNo;
@@ -121,6 +103,14 @@ public class CompanyCprPREListEntity {
 
   @Column(name = "contact_no")
   String contactNo;
+
+  String status;
+
+  @Column(name = "inspection_time_from")
+  String inspectionTimeFrom;
+
+  @Column(name = "inspection_time_to")
+  String inspectionTimeTo;
 //
 //    @Column(name = "validity_date")
 //    String dateTime;
