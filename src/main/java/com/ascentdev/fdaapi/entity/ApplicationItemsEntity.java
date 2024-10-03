@@ -33,13 +33,13 @@ import org.hibernate.annotations.Subselect;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ApplicationItemsEntity {
 
-  @Id
   @Column(name = "id")
-  long id;
+  String applicationItemId;
 
   @Column(name = "document_type")
   String documentType;
 
+  @Id
   @Column(name = "document_id")
   long documentId;
 

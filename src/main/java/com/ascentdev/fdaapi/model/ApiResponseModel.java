@@ -19,6 +19,6 @@ public class ApiResponseModel {
   int status_code;
   int role_id;
   int user_id;
-  List<?> data, schedData, fullSchedData;
+  List<?> data, schedData, fullSchedData, documentList;
 //  LtoCprModel model;
 }

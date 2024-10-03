@@ -11,18 +11,22 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
- * @author
- * ASCENT
+ * @author ASCENT
  */
-
 public interface ForInspectionService {
-  
+
   ApiResponseModel getCompanyList(String company_name, String permit_type, String inspection_type);
 //  ApiResponseModel saveInspectionData();
-  
-  ApiResponseModel saveInspectedLtoCpr(int schedule_id,String lto_no, String cpr_no, String permit_type, String product_type, String primary_activity, 
-          String company_name, String office_address, String contact_person, String contact_no, String inspection_type, int created_by_id, 
+
+  ApiResponseModel reschedInspection(int schedule_id, String date_from, String date_to, String remarks);
+
+  ApiResponseModel saveInspectedLtoCpr(int schedule_id, String lto_no, String cpr_no, String permit_type, String product_type, String primary_activity,
+          String company_name, String office_address, String contact_person, String contact_no, String inspection_type, int created_by_id,
           String remarks, String exit_remarks, String document_type, MultipartFile[] file, MultipartFile[] signFile);
-  
-  ApiResponseModel getInspectionSched(String inspection_sched);
+
+  ApiResponseModel getInspectionSched(String inspection_sched, int inspector_id);
+
+  ApiResponseModel getDocumentList();
+
+  ApiResponseModel confirmInspection(int schedule_id);
 }

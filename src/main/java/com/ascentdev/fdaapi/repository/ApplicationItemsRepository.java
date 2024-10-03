@@ -7,6 +7,7 @@ package com.ascentdev.fdaapi.repository;
 
 import com.ascentdev.fdaapi.entity.ApplicationItemsEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.query.Param;
 
 /**
  *
@@ -14,6 +15,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface ApplicationItemsRepository extends JpaRepository<ApplicationItemsEntity, Long> {
 
-    ApplicationItemsEntity findByDocumentTypeAndId(String document_type, int id);
+    ApplicationItemsEntity findByApplicationItemId(String application_item_id);
     
 }

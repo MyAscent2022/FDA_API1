@@ -17,6 +17,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface CompanyCprPREListRepository extends JpaRepository<CompanyCprPREListEntity, Integer>{
   
   List<CompanyCprPREListEntity> findByUserId(int user_id);
+//  List<CompanyCprPREListEntity> findByInspectorId(int inspector_id);
   List<CompanyCprPREListEntity> findByApplicationNo(String application_no);
   
 }

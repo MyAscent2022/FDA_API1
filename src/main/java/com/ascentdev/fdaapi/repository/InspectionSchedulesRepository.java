@@ -18,7 +18,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface InspectionSchedulesRepository extends JpaRepository<InspectionSchedulesEntity, Integer> {
   
-    List<InspectionSchedulesEntity> findByInspectionSchedAndStatus(Date inspection_sched, String status);
-    List<InspectionSchedulesEntity> findByStatus(String status);
+    List<InspectionSchedulesEntity> findByInspectionSchedAndStatusInAndInspectorId(Date inspection_sched, List<String> status, int inspectorId);
+    List<InspectionSchedulesEntity> findByStatusInAndInspectorId(List<String> status, int inspectorId);
   InspectionSchedulesEntity findById(int schedule_id);
 }

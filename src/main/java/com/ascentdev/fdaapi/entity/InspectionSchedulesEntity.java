@@ -25,37 +25,53 @@ import org.hibernate.annotations.Subselect;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class InspectionSchedulesEntity {
 
-    @Id
-    int id;
+  @Id
+  int id;
 
-    @Column(name = "created_at")
-    Timestamp createdAt;
+  @Column(name = "created_at")
+  Timestamp createdAt;
 
-    @Column(name = "inspection_date")
-    Date inspectionSched;
+  @Column(name = "inspection_date")
+  Date inspectionSched;
 
-    @Column(name = "inspector_id")
-    int inspectorId;
+  @Column(name = "inspector_id")
+  int inspectorId;
 
-    @Column(name = "reference_number")
-    String referenceNo;
+  @Column(name = "reference_number")
+  String referenceNo;
 
-    @Column(name = "remarks")
-    String remarks;
+  @Column(name = "remarks")
+  String remarks;
 
-    @Column(name = "status")
-    String status;
+  @Column(name = "status")
+  String status;
 
-    @Column(name = "updated_at")
-    Timestamp updatedAt;
+  @Column(name = "updated_at")
+  Timestamp updatedAt;
 
-    @Column(name = "application_item_id")
-    int applicationItemId;
-    
-    @Column(name = "document_id")
-    int documentId  ;
+  @Column(name = "application_item_id")
+  String applicationItemId;
 
-    @Column(name = "application_item_type")
-    String applicationItemType;
+  @Column(name = "document_id")
+  int documentId;
 
+  @Column(name = "application_number")
+  String applicationNumber;
+
+  @Column(name = "document_type")
+  String documentType;
+
+  @Column(name = "resched_inspection_date_from")
+  Timestamp reschedInspectionDateFrom;
+  
+    @Column(name = "resched_inspection_date_to")
+  Timestamp reschedInspectionDateTo;
+  
+  @Column(name = "resched_remarks")
+  String reschedRemarks;
+  
+  @Column(name = "is_notify")
+  Boolean isNotify;
+//    @Column(name = "application_item_type")
+//    String applicationItemType;
 }
