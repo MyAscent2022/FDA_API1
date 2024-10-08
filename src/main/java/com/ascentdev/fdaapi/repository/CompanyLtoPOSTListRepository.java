@@ -18,6 +18,6 @@ public interface CompanyLtoPOSTListRepository extends JpaRepository<CompanyLtoPO
 
   List<CompanyLtoPOSTListEntity> findByUserId(int user_id);
 //  List<CompanyLtoPOSTListEntity> findByInspectorId(int inspector_id);
-  List<CompanyLtoPOSTListEntity> findByApplicationNo(String application_no);
+  CompanyLtoPOSTListEntity findByApplicationNo(String application_no);
 
 }

@@ -18,6 +18,6 @@ public interface CompanyCprPOSTListRepository extends JpaRepository<CompanyCprPO
   
   List<CompanyCprPOSTListEntity> findByUserId(int user_id);
   List<CompanyCprPOSTListEntity> findByInspectorId(int inspector_id);
-  List<CompanyCprPOSTListEntity> findByApplicationNo(String application_no);
+  CompanyCprPOSTListEntity findByApplicationNo(String application_no);
   
 }

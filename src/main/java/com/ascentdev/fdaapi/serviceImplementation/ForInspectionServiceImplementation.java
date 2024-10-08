@@ -349,146 +349,100 @@ public class ForInspectionServiceImplementation implements ForInspectionService 
     List<CompanyCprPREListEntity> preCpr = new ArrayList<>();
     List<CompanyLtoPOSTListEntity> postLto = new ArrayList<>();
     List<CompanyLtoPREListEntity> preLto = new ArrayList<>();
+    
+    CompanyLtoPREListEntity preLtoEntity = new CompanyLtoPREListEntity();
+    CompanyLtoPOSTListEntity postLtoEntity = new CompanyLtoPOSTListEntity();
+    CompanyCprPREListEntity preCprEntity = new CompanyCprPREListEntity();
+    CompanyCprPOSTListEntity postCprEntity = new CompanyCprPOSTListEntity();
 
     try {
       sched = iSchedRepo.findByInspectionSchedAndStatusInAndInspectorId(Date.valueOf(inspection_sched), Arrays.asList("FOR_CONFIRMATION", "CONFIRMED"), inspector_id);
       fullSched = iSchedRepo.findByStatusInAndInspectorId(Arrays.asList("FOR_CONFIRMATION", "CONFIRMED"), inspector_id);
 
-//      if (sched != null && sched.size() > 0) {
-//        int i = 0;
-//        model.setSchedData(sched);
-//        model.setFullSchedData(fullSched);
-        
-//        for (i = 0; i < sched.size(); i++) {
-//
-//            if (sched.get(i).getDocumentType().equals("LTO")) {
-//              preLto = preLtoRepo.findByApplicationNo(sched.get(i).getApplicationNumber());
-//              if (preLto.size() > 0) {
-//                model.setData(preLto);
-//                model.setMessage("Data found");
-//                model.setStatus(true);
-//                model.setStatus_code(200);
-//              } else {
-//                model.setMessage("This Company has no schedule for Inspection");
-//                model.setStatus(false);
-//                model.setStatus_code(404);
-//              }
-//            } else if (sched.get(i).getDocumentType().equals("LTOR")) {
-//              postLto = postLtoRepo.findByApplicationNo(sched.get(i).getApplicationNumber());
-//              if (postLto.size() > 0) {
-//                model.setData(postLto);
-//                model.setMessage("Data found");
-//                model.setStatus(true);
-//                model.setStatus_code(200);
-//              } else {
-//                model.setMessage("This Company has no schedule for Inspection");
-//                model.setStatus(false);
-//                model.setStatus_code(404);
-//              }
-//            } else if (sched.get(i).getDocumentType().equals("CPR")) {
-//              preCpr = preCprRepo.findByApplicationNo(sched.get(i).getApplicationNumber());
-//              if (preCpr.size() > 0) {
-//                model.setData(preCpr);
-//                model.setMessage("Data found");
-//                model.setStatus(true);
-//                model.setStatus_code(200);
-//              } else {
-//                model.setMessage("This Company has no schedule for Inspection");
-//                model.setStatus(false);
-//                model.setStatus_code(404);
-//              }
-//            } else if (sched.get(i).getDocumentType().equals("CPRR")) {
-//              postCpr = postCprRepo.findByApplicationNo(sched.get(i).getApplicationNumber());
-//              if (postCpr.size() > 0) {
-//                model.setData(postCpr);
-//                model.setMessage("Data found");
-//                model.setStatus(true);
-//                model.setStatus_code(200);
-//              } else {
-//                model.setMessage("This Company has no schedule for Inspection");
-//                model.setStatus(false);
-//                model.setStatus_code(404);
-//              }
-//            }
-//         
-//        }
+      if (fullSched != null && fullSched.size() > 0) {
 
+        if (sched != null && sched.size() > 0) {
+          for (int i = 0; i < sched.size(); i++) {
+            String appNo = sched.get(i).getApplicationNumber();
 
+            // Check for LTO
+            preLtoEntity = preLtoRepo.findByApplicationNo(appNo);
+            if (preLtoEntity != null) {
+              
+              preLto.add(preLtoEntity);
+              preLtoEntity =  new CompanyLtoPREListEntity();
+              model.setData(preLto);
+              model.setFullSchedData(fullSched);
+              model.setMessage("LTO data found");
+              model.setStatus(true);
+              model.setStatus_code(200);
+              continue;  // Move to the next iteration if data is found
+            }
 
-//      } else {
-//        model.setData(null);
-//        model.setMessage("No Data Found");
-//        model.setStatus(false);
-//        model.setStatus_code(404);
-//      }
+            // Check for LTOR
+            postLtoEntity = postLtoRepo.findByApplicationNo(appNo);
+            if (postLtoEntity != null) {
+              
+              postLto.add(postLtoEntity);
+              postLtoEntity = new CompanyLtoPOSTListEntity();
+              
+              model.setData(postLto);
+              model.setFullSchedData(fullSched);
+              model.setMessage("LTOR data found");
+              model.setStatus(true);
+              model.setStatus_code(200);
+              continue;
+            }
 
+            // Check for CPR
+            preCprEntity = preCprRepo.findByApplicationNo(appNo);
+            if (preCprEntity != null) {
+              
+              preCpr.add(preCprEntity);
+              preCprEntity = new CompanyCprPREListEntity();
+              
+              model.setData(preCpr);
+              model.setFullSchedData(fullSched);
+              model.setMessage("CPR data found");
+              model.setStatus(true);
+              model.setStatus_code(200);
+              continue;
+            }
 
+            // Check for CPRR
+            postCprEntity = postCprRepo.findByApplicationNo(appNo);
+            if (postCprEntity != null) {
+              
+              postCpr.add(postCprEntity);
+              postCprEntity = new CompanyCprPOSTListEntity();
+              
+              model.setData(postCpr);
+              model.setFullSchedData(fullSched);
+              model.setMessage("CPRR data found");
+              model.setStatus(true);
+              model.setStatus_code(200);
+              continue;
+            }
 
-if (sched != null && sched.size() > 0) {
-    for (int i = 0; i < sched.size(); i++) {
-        String appNo = sched.get(i).getApplicationNumber();
-
-        // Check for LTO
-        preLto = preLtoRepo.findByApplicationNo(appNo);
-        if (preLto != null && preLto.size() > 0) {
-            model.setData(preLto);
-            model.setMessage("LTO data found");
-            model.setStatus(true);
-            model.setStatus_code(200);
-            continue;  // Move to the next iteration if data is found
+            // If no data found in any case
+            model.setMessage("This Company has no schedule for Inspection");
+            model.setStatus(false);
+            model.setStatus_code(404);
+          }
+        } else {
+          model.setData(null);
+          model.setFullSchedData(fullSched);
+          model.setStatus(true);
+          model.setStatus_code(200);
         }
 
-        // Check for LTOR
-        postLto = postLtoRepo.findByApplicationNo(appNo);
-        if (postLto != null && postLto.size() > 0) {
-            model.setData(postLto);
-            model.setMessage("LTOR data found");
-            model.setStatus(true);
-            model.setStatus_code(200);
-            continue;
-        }
-
-        // Check for CPR
-        preCpr = preCprRepo.findByApplicationNo(appNo);
-        if (preCpr != null && preCpr.size() > 0) {
-            model.setData(preCpr);
-            model.setMessage("CPR data found");
-            model.setStatus(true);
-            model.setStatus_code(200);
-            continue;
-        }
-
-        // Check for CPRR
-        postCpr = postCprRepo.findByApplicationNo(appNo);
-        if (postCpr != null && postCpr.size() > 0) {
-            model.setData(postCpr);
-            model.setMessage("CPRR data found");
-            model.setStatus(true);
-            model.setStatus_code(200);
-            continue;
-        }
-
-        // If no data found in any case
-        model.setMessage("This Company has no schedule for Inspection");
-        model.setStatus(false);
-        model.setStatus_code(404);
-    }
-} else {
-    model.setData(null);
-    model.setMessage("No Data Found");
-    model.setStatus(false);
-    model.setStatus_code(404);
-}
-
-
-
-
-
-
-
-
-
-
+      } else {
+          model.setData(null);
+          model.setFullSchedData(null);
+          model.setMessage("No Data Found");
+          model.setStatus(false);
+          model.setStatus_code(404);
+      }
 
     } catch (ErrorException ex) {
       if (ex1 == null) {
