@@ -22,7 +22,7 @@ public interface CompanyLtoPREListRepository extends JpaRepository<CompanyLtoPRE
 
   List<CompanyLtoPREListEntity> findByUserId(int userId);
 //  List<CompanyLtoPREListEntity> findByInspectorId(int inspectorId);
-  List<CompanyLtoPREListEntity> findByApplicationNo(String application_no);
+  CompanyLtoPREListEntity findByApplicationNo(String application_no);
   
   
   
