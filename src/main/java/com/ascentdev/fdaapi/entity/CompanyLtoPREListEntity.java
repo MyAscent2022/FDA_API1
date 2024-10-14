@@ -51,6 +51,7 @@ import org.hibernate.annotations.Subselect;
         + "la.application_number, \n"
         + "la.id AS lto_application_id, \n"
         + "iSched.document_type,\n"
+        + "iSched.document_id,\n"
         + "iSched.inspection_type,\n"
         + "iSched.inspection_date, \n"
         + "iSched.status,\n"
@@ -61,7 +62,10 @@ import org.hibernate.annotations.Subselect;
         + "rpa.name AS primary_activity,\n"
         + "CONCAT(laa.street_name, ',', rm.citymun_desc, ',', pr.prov_desc) AS office_address,\n"
         + "CONCAT(up.first_name, ' ' ,up.last_name) as contact_person,\n"
-        + "la.establishment_mobile AS contact_no\n"
+        + "la.establishment_mobile AS contact_no,\n"
+        + "iSched.is_notify,\n"
+        + "iSched.client_id, \n"
+        + "rat.type_name\n"
         + "FROM inspections.inspection_schedules iSched\n"
         + "INNER JOIN lto.lto_applications la ON la.application_number = iSched.application_number\n"
         + "INNER JOIN commons.users u ON u.id = la.created_by_id\n"
@@ -72,6 +76,7 @@ import org.hibernate.annotations.Subselect;
         + "INNER JOIN lto.lto_application_addresses laa ON laa.id = la.office_address_id\n"
         + "INNER JOIN refs.ref_municipalities rm ON rm.muni_id = laa.city_municipal_id\n"
         + "INNER JOIN refs.ref_provinces pr ON pr.province_id = laa.province_id\n"
+        + "INNER JOIN refs.ref_application_types rat ON rat.id = la.application_type_id\n"
         + "WHERE iSched.status IN ('FOR_CONFIRMATION', 'CONFIRMED')")
 public class CompanyLtoPREListEntity {
 
@@ -130,5 +135,17 @@ public class CompanyLtoPREListEntity {
 
   @Column(name = "inspection_time_to")
   String inspectionTimeTo;
+
+  @Column(name = "type_name")
+  String applicationType;
+
+  @Column(name = "is_notify")
+  Boolean isNotify;
+
+  @Column(name = "client_id")
+  int clientId;
+
+  @Column(name = "document_id")
+  int documentId;
 
 }

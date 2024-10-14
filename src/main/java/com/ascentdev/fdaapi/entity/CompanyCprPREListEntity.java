@@ -21,22 +21,26 @@ import org.hibernate.annotations.Subselect;
 @Data
 @Entity
 @Subselect("SELECT \n"
-        + "iSched.id,\n"
-        + "u.id AS user_id,\n"
-        + "ca.application_number,\n"
-        + "iSched.inspector_id,\n"
-        + "iSched.document_type,\n"
-        + "iSched.inspection_type,\n"
-        + "iSched.inspection_date, \n"
-        + "iSched.status, \n"
-        + "iSched.inspection_time_from,\n"
-        + "iSched.inspection_time_to,\n"
-        + "ubp.name as company_name,\n"
-        + "rpt.name AS product_type,\n"
-        + "rpa.name AS primary_activity,\n"
-        + "CONCAT(up.first_name, ' ' ,up.last_name) as contact_person,\n"
-        + "ubp.mobile_no as contact_no,\n"
-        + "CONCAT(laa.street_name, ',', rm.citymun_desc, ',', pr.prov_desc) AS office_address\n"
+        + "    iSched.id,\n"
+        + "    u.id AS user_id,\n"
+        + "    ca.application_number,\n"
+        + "    iSched.inspector_id,\n"
+        + "    iSched.document_type,\n"
+        + "    iSched.document_id,\n"
+        + "    iSched.inspection_type,\n"
+        + "    iSched.inspection_date, \n"
+        + "    iSched.status, \n"
+        + "    iSched.inspection_time_from,\n"
+        + "    iSched.inspection_time_to,\n"
+        + "    ubp.name as company_name,\n"
+        + "    rpt.name AS product_type,\n"
+        + "    rpa.name AS primary_activity,\n"
+        + "    CONCAT(up.first_name, ' ' ,up.last_name) as contact_person,\n"
+        + "    ubp.mobile_no as contact_no,\n"
+        + "    CONCAT(laa.street_name, ',', rm.citymun_desc, ',', pr.prov_desc) AS office_address,\n"
+        + "    iSched.is_notify,\n"
+        + "    iSched.client_id,\n"
+        + "    rat.type_name\n"
         + "FROM inspections.inspection_schedules iSched\n"
         + "INNER JOIN cpr.cpr_applications ca ON ca.application_number = iSched.application_number\n"
         + "INNER JOIN lto.lto_records lr ON lr.id = ca.lto_record_id\n"
@@ -48,6 +52,16 @@ import org.hibernate.annotations.Subselect;
         + "INNER JOIN lto.lto_record_addresses laa ON laa.id = lr.office_address_id\n"
         + "INNER JOIN refs.ref_municipalities rm ON rm.muni_id = laa.city_municipal_id\n"
         + "INNER JOIN refs.ref_provinces pr ON pr.province_id = laa.province_id\n"
+        + "INNER JOIN (\n"
+        + "    SELECT lah1.*\n"
+        + "    FROM lto.lto_application_hist lah1\n"
+        + "    INNER JOIN (\n"
+        + "        SELECT lto_number, MAX(created_at) AS latest_history_date\n"
+        + "        FROM lto.lto_application_hist\n"
+        + "        GROUP BY lto_number\n"
+        + "    ) lah2 ON lah1.lto_number = lah2.lto_number AND lah1.created_at = lah2.latest_history_date\n"
+        + ") lah ON lah.lto_number = lr.lto_number\n"
+        + "INNER JOIN refs.ref_application_types rat ON rat.id = lah.application_type_id\n"
         + "WHERE iSched.status IN ('FOR_CONFIRMATION', 'CONFIRMED')")
 
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -114,4 +128,15 @@ public class CompanyCprPREListEntity {
 //
 //    @Column(name = "validity_date")
 //    String dateTime;
+  @Column(name = "is_notify")
+  Boolean isNotify;
+
+  @Column(name = "client_id")
+  int clientId;
+
+  @Column(name = "document_id")
+  int document_id;
+
+  @Column(name = "type_name")
+  String applicationType;
 }

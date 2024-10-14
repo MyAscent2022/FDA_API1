@@ -13,7 +13,9 @@ import com.ascentdev.fdaapi.entity.CompanyLtoPREListEntity;
 import com.ascentdev.fdaapi.entity.DocumentListEntity;
 import com.ascentdev.fdaapi.entity.InspectionLogsEntity;
 import com.ascentdev.fdaapi.entity.InspectionSchedulesEntity;
+import com.ascentdev.fdaapi.entity.NotificationEntity;
 import com.ascentdev.fdaapi.entity.RequiredFilesEntity;
+import com.ascentdev.fdaapi.entity.UserEntity;
 import com.ascentdev.fdaapi.entity.UserIdByCompanyEntity;
 import com.ascentdev.fdaapi.error.ErrorException;
 import com.ascentdev.fdaapi.model.ApiResponseModel;
@@ -42,7 +44,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.ascentdev.fdaapi.repository.CompanyLtoPREListRepository;
 import com.ascentdev.fdaapi.repository.DocumentListRepository;
+import com.ascentdev.fdaapi.repository.NotificationRepository;
 import com.ascentdev.fdaapi.repository.RequiredFilesRepository;
+import com.ascentdev.fdaapi.repository.UsersRepository;
 import java.sql.Date;
 import java.util.Arrays;
 
@@ -82,6 +86,12 @@ public class ForInspectionServiceImplementation implements ForInspectionService 
 
   @Autowired
   DocumentListRepository docsRepo;
+
+  @Autowired
+  NotificationRepository notifRepo;
+
+  @Autowired
+  UsersRepository userRepo;
 
   String fileUploadPath = "C:\\APPS\\FDA\\FDA_IMAGES\\IMAGES";
   String fileUploadPath1 = "C:\\APPS\\FDA\\FDA_IMAGES\\SIGNATURES";
@@ -208,7 +218,7 @@ public class ForInspectionServiceImplementation implements ForInspectionService 
   @Override
   public ApiResponseModel saveInspectedLtoCpr(int schedule_id, String lto_no, String cpr_no, String permit_type, String product_type, String primary_activity,
           String company_name, String office_address, String contact_person, String contact_no, String inspection_type, int created_by_id,
-          String remarks, String exit_remarks, String document_type, MultipartFile[] file, MultipartFile[] signFile) {
+          String remarks, String exit_remarks, String document_type, int document_id, int client_id, String application_no, String application_type, boolean is_notify, MultipartFile[] file, MultipartFile[] signFile) {
 
     ErrorException ex1 = null;
     ApiResponseModel resp = new ApiResponseModel();
@@ -216,8 +226,40 @@ public class ForInspectionServiceImplementation implements ForInspectionService 
     InspectionLogsEntity inspection = new InspectionLogsEntity();
     InspectionSchedulesEntity iSched = new InspectionSchedulesEntity();
     RequiredFilesEntity reqEntity = new RequiredFilesEntity();
+    NotificationEntity notifEntity = new NotificationEntity();
+    UserEntity usersEntity = new UserEntity();
 
     try {
+
+      usersEntity = userRepo.findById(created_by_id);
+
+      if (is_notify) {
+        notifEntity.setCreatedDt(Timestamp.valueOf(date));
+        notifEntity.setApplicationId(document_id);
+        notifEntity.setApplicationNumber(application_no);
+        notifEntity.setClientId(client_id);
+        notifEntity.setNotificationObject(1);
+        notifEntity.setProcessFlowId(5);
+        notifEntity.setModule(permit_type);
+        notifEntity.setRoleId(0);
+        notifEntity.setSeen(false);
+        notifEntity.setProcess(false);
+        notifEntity.setApplicationType(application_type);
+        notifRepo.save(notifEntity);
+      } 
+        notifEntity.setCreatedDt(Timestamp.valueOf(date));
+        notifEntity.setApplicationId(document_id);
+        notifEntity.setApplicationNumber(application_no);
+        notifEntity.setClientId(0);
+        notifEntity.setNotificationObject(2);
+        notifEntity.setProcessFlowId(4);
+        notifEntity.setModule(permit_type);
+        notifEntity.setRoleId(3);
+        notifEntity.setSeen(false);
+        notifEntity.setProcess(false);
+        notifEntity.setApplicationType(application_type);
+        notifRepo.save(notifEntity);
+      
 
       iSched = iSchedRepo.findById(schedule_id);
       iSched.setRemarks(exit_remarks);
@@ -227,7 +269,7 @@ public class ForInspectionServiceImplementation implements ForInspectionService 
       String[] signature_type = {"CLIENT", "INSPECTOR"};
       String[] remarks1 = null;
       String[] documents = null;
-      int document_id = 0;
+      int document_id1 = 0;
       if (remarks != null && !remarks.isEmpty()) {
         remarks1 = remarks.split(",");
       }
@@ -241,7 +283,7 @@ public class ForInspectionServiceImplementation implements ForInspectionService 
       for (MultipartFile f : file) {
         DocumentListEntity docEntity = docsRepo.findByName(documents[count]);
         if (docEntity != null) {
-          document_id = docEntity.getId();
+          document_id1 = docEntity.getId();
           reqEntity.setFilePath(fileUploadPath);
           reqEntity.setFileName(f.getOriginalFilename());
           reqEntity.setFileType("FILE");
@@ -252,7 +294,7 @@ public class ForInspectionServiceImplementation implements ForInspectionService 
             reqEntity.setRemarks(remarks1[0]);
           }
 
-          reqEntity.setDocumentId(document_id);
+          reqEntity.setDocumentId(document_id1);
           reqEntity.setInspectionSchedId(schedule_id);
           reqEntity.setCreatedAt(Timestamp.valueOf(date));
 
@@ -276,13 +318,13 @@ public class ForInspectionServiceImplementation implements ForInspectionService 
         }
 
         if (docEntity != null) {
-          document_id = docEntity.getId();
+          document_id1 = docEntity.getId();
 
           reqEntity.setFilePath(fileUploadPath1);
           reqEntity.setFileName(s.getOriginalFilename());
           reqEntity.setFileType("SIGNATURE");
           reqEntity.setSignatoryType(signature_type[count1]);
-          reqEntity.setDocumentId(document_id);
+          reqEntity.setDocumentId(document_id1);
           reqEntity.setInspectionSchedId(schedule_id);
           reqEntity.setCreatedAt(Timestamp.valueOf(date));
 
@@ -349,7 +391,7 @@ public class ForInspectionServiceImplementation implements ForInspectionService 
     List<CompanyCprPREListEntity> preCpr = new ArrayList<>();
     List<CompanyLtoPOSTListEntity> postLto = new ArrayList<>();
     List<CompanyLtoPREListEntity> preLto = new ArrayList<>();
-    
+
     CompanyLtoPREListEntity preLtoEntity = new CompanyLtoPREListEntity();
     CompanyLtoPOSTListEntity postLtoEntity = new CompanyLtoPOSTListEntity();
     CompanyCprPREListEntity preCprEntity = new CompanyCprPREListEntity();
@@ -368,9 +410,9 @@ public class ForInspectionServiceImplementation implements ForInspectionService 
             // Check for LTO
             preLtoEntity = preLtoRepo.findByApplicationNo(appNo);
             if (preLtoEntity != null) {
-              
+
               preLto.add(preLtoEntity);
-              preLtoEntity =  new CompanyLtoPREListEntity();
+              preLtoEntity = new CompanyLtoPREListEntity();
               model.setData(preLto);
               model.setFullSchedData(fullSched);
               model.setMessage("LTO data found");
@@ -382,10 +424,10 @@ public class ForInspectionServiceImplementation implements ForInspectionService 
             // Check for LTOR
             postLtoEntity = postLtoRepo.findByApplicationNo(appNo);
             if (postLtoEntity != null) {
-              
+
               postLto.add(postLtoEntity);
               postLtoEntity = new CompanyLtoPOSTListEntity();
-              
+
               model.setData(postLto);
               model.setFullSchedData(fullSched);
               model.setMessage("LTOR data found");
@@ -397,10 +439,10 @@ public class ForInspectionServiceImplementation implements ForInspectionService 
             // Check for CPR
             preCprEntity = preCprRepo.findByApplicationNo(appNo);
             if (preCprEntity != null) {
-              
+
               preCpr.add(preCprEntity);
               preCprEntity = new CompanyCprPREListEntity();
-              
+
               model.setData(preCpr);
               model.setFullSchedData(fullSched);
               model.setMessage("CPR data found");
@@ -412,10 +454,10 @@ public class ForInspectionServiceImplementation implements ForInspectionService 
             // Check for CPRR
             postCprEntity = postCprRepo.findByApplicationNo(appNo);
             if (postCprEntity != null) {
-              
+
               postCpr.add(postCprEntity);
               postCprEntity = new CompanyCprPOSTListEntity();
-              
+
               model.setData(postCpr);
               model.setFullSchedData(fullSched);
               model.setMessage("CPRR data found");
@@ -437,11 +479,11 @@ public class ForInspectionServiceImplementation implements ForInspectionService 
         }
 
       } else {
-          model.setData(null);
-          model.setFullSchedData(null);
-          model.setMessage("No Data Found");
-          model.setStatus(false);
-          model.setStatus_code(404);
+        model.setData(null);
+        model.setFullSchedData(null);
+        model.setMessage("No Data Found");
+        model.setStatus(false);
+        model.setStatus_code(404);
       }
 
     } catch (ErrorException ex) {
