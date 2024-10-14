@@ -24,6 +24,7 @@ import org.hibernate.annotations.Subselect;
         + "u.id AS user_id,\n"
         + "iSched.application_number,\n"
         + "iSched.document_type,\n"
+        + "iSched.document_id,\n"
         + "iSched.inspection_type,\n"
         + "iSched.inspection_date,\n"
         + "iSched.inspector_id,\n"
@@ -35,7 +36,10 @@ import org.hibernate.annotations.Subselect;
         + "rpa.name AS primary_activity,\n"
         + "CONCAT(lra.street_name, ',', rm.citymun_desc, ',', pr.prov_desc) AS office_address,\n"
         + "CONCAT(up.first_name, ' ' ,up.last_name) as contact_person,\n"
-        + "ubp.mobile_no as contact_no\n"
+        + "ubp.mobile_no as contact_no,\n"
+        + "iSched.is_notify,\n"
+        + "iSched.client_id,\n"
+        + "rat.type_name\n"
         + "FROM inspections.inspection_schedules iSched\n"
         + "INNER JOIN cpr.cpr_records cr ON cr.inspection_schedule_id = iSched.id\n"
         + "INNER JOIN lto.lto_records lr ON lr.id = cr.lto_record_id\n"
@@ -47,6 +51,16 @@ import org.hibernate.annotations.Subselect;
         + "INNER JOIN lto.lto_record_addresses lra ON lra.id = lr.office_address_id\n"
         + "INNER JOIN refs.ref_municipalities rm ON rm.muni_id = lra.city_municipal_id\n"
         + "INNER JOIN refs.ref_provinces pr ON pr.province_id = lra.province_id\n"
+        + "INNER JOIN (\n"
+        + "    SELECT lah1.*\n"
+        + "    FROM lto.lto_application_hist lah1\n"
+        + "    INNER JOIN (\n"
+        + "        SELECT lto_number, MAX(created_at) AS latest_history_date\n"
+        + "        FROM lto.lto_application_hist\n"
+        + "        GROUP BY lto_number\n"
+        + "    ) lah2 ON lah1.lto_number = lah2.lto_number AND lah1.created_at = lah2.latest_history_date\n"
+        + ") lah ON lah.lto_number = lr.lto_number\n"
+        + "INNER JOIN refs.ref_application_types rat ON rat.id = lah.application_type_id\n"
         + "WHERE iSched.status IN ('FOR_CONFIRMATION', 'CONFIRMED')")
 public class CompanyCprPOSTListEntity {
 
@@ -58,6 +72,12 @@ public class CompanyCprPOSTListEntity {
 
   @Column(name = "inspector_id")
   int inspectorId;
+
+  @Column(name = "client_id")
+  int clientId;
+
+  @Column(name = "document_id")
+  int documentId;
 
   @Column(name = "application_number")
   String applicationNo;
@@ -96,4 +116,10 @@ public class CompanyCprPOSTListEntity {
 
   @Column(name = "inspection_time_to")
   String inspectionTimeTo;
+
+  @Column(name = "is_notify")
+  Boolean isNotify;
+
+  @Column(name = "type_name")
+  String applicationType;
 }

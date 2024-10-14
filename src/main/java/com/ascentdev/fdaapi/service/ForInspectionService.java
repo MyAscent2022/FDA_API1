@@ -22,7 +22,7 @@ public interface ForInspectionService {
 
   ApiResponseModel saveInspectedLtoCpr(int schedule_id, String lto_no, String cpr_no, String permit_type, String product_type, String primary_activity,
           String company_name, String office_address, String contact_person, String contact_no, String inspection_type, int created_by_id,
-          String remarks, String exit_remarks, String document_type, MultipartFile[] file, MultipartFile[] signFile);
+          String remarks, String exit_remarks, String document_type, int document_id, int client_id, String application_no, String application_type, boolean is_notify, MultipartFile[] file, MultipartFile[] signFile);
 
   ApiResponseModel getInspectionSched(String inspection_sched, int inspector_id);
 

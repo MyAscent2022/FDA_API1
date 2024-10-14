@@ -57,11 +57,16 @@ public class InspectionController {
           @RequestParam("remarks") String remarks,
           @RequestParam("exit_remarks") String exit_remarks,
           @RequestParam("document_type") String document_type,
+          @RequestParam("document_id") int document_id,
+          @RequestParam("client_id") int client_id,
+          @RequestParam("application_no") String application_no,
+          @RequestParam("application_type") String application_type,
+          @RequestParam("is_notify") boolean is_notify,
           @RequestParam("file[]") MultipartFile[] file,
           @RequestParam("signFile[]") MultipartFile[] signFile) {
 //    MultipartFile[] file = null;
     return inspectionServiceImp.saveInspectedLtoCpr(schedule_id, lto_no, cpr_no, permit_type, product_type, primary_activity, company_name, office_address, contact_person, contact_no,
-            inspection_type, created_by_id, remarks, exit_remarks, document_type, file, signFile);
+            inspection_type, created_by_id, remarks, exit_remarks, document_type,document_id,client_id,application_no,application_type,is_notify, file, signFile);
   }
 
   @PostMapping("reschedule_inspection")
